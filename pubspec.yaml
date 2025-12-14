@@ -1,0 +1,15 @@
+name: music_app
+description: Ad-free royalty free music streaming app
+publish_to: "none"
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  just_audio: ^0.9.36
+
+flutter:
+  uses-material-design: true
