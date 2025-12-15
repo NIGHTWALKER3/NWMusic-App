@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/music_provider.dart';
 import '../player/audio_player.dart';
+import '../widgets/mini_player.dart';
 import 'search_screen.dart';
 
 class GenreScreen extends StatefulWidget {
@@ -42,19 +43,30 @@ class _GenreScreenState extends State<GenreScreen> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: songs.length,
-        itemBuilder: (context, index) {
-          final song = songs[index];
-          return ListTile(
-            title: Text(song['name']),
-            subtitle: Text(song['artist_name']),
-            onTap: () {
-              // 🔥 CORRECT NEW METHOD
-              AppAudioPlayer.playFromList(songs, index);
-            },
-          );
-        },
+
+      // 👇 BODY + MINI PLAYER
+      body: Column(
+        children: [
+          // 🎵 SONG LIST
+          Expanded(
+            child: ListView.builder(
+              itemCount: songs.length,
+              itemBuilder: (context, index) {
+                final song = songs[index];
+                return ListTile(
+                  title: Text(song['name']),
+                  subtitle: Text(song['artist_name']),
+                  onTap: () {
+                    AppAudioPlayer.playFromList(songs, index);
+                  },
+                );
+              },
+            ),
+          ),
+
+          // 🎧 MINI PLAYER (BOTTOM)
+          const MiniPlayer(),
+        ],
       ),
     );
   }
