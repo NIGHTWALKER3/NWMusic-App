@@ -11,7 +11,7 @@ class GenreScreen extends StatefulWidget {
 }
 
 class _GenreScreenState extends State<GenreScreen> {
-  List songs = [];
+  List<Map<String, dynamic>> songs = [];
   String genre = "chill";
 
   @override
@@ -20,9 +20,9 @@ class _GenreScreenState extends State<GenreScreen> {
     loadMusic();
   }
 
-  void loadMusic() async {
+  Future<void> loadMusic() async {
     final data = await MusicProvider.getByGenre(genre);
-    setState(() => songs = data);
+    setState(() => songs = List<Map<String, dynamic>>.from(data));
   }
 
   @override
@@ -36,10 +36,10 @@ class _GenreScreenState extends State<GenreScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => SearchScreen()), // removed const
+                MaterialPageRoute(builder: (_) => const SearchScreen()),
               );
             },
-          )
+          ),
         ],
       ),
       body: ListView.builder(
@@ -50,7 +50,8 @@ class _GenreScreenState extends State<GenreScreen> {
             title: Text(song['name']),
             subtitle: Text(song['artist_name']),
             onTap: () {
-              AppAudioPlayer.play(song['audio']);
+              // 🔥 CORRECT NEW METHOD
+              AppAudioPlayer.playFromList(songs, index);
             },
           );
         },
