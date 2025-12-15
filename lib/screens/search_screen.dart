@@ -27,27 +27,32 @@ class _SearchScreenState extends State<SearchScreen> {
         title: const Text("Search Music"),
       ),
 
-      // 👇 BODY + MINI PLAYER
-      body: Column(
+      // 👇 BODY + MINI PLAYER FLOATING
+      body: Stack(
         children: [
-          // 🔎 SEARCH FIELD
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                hintText: "Song or artist",
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: search,
+          Column(
+            children: [
+              // 🔎 SEARCH FIELD
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: TextField(
+                  controller: controller,
+                  decoration: InputDecoration(
+                    hintText: "Song or artist",
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: search,
+                    ),
+                  ),
+                  onSubmitted: (_) => search(),
                 ),
               ),
-              onSubmitted: (_) => search(),
-            ),
+            ],
           ),
 
           // 🎵 SONG LIST
-          Expanded(
+          Padding(
+            padding: const EdgeInsets.only(top: 70, bottom: 90), // space for search & player
             child: ListView.builder(
               itemCount: songs.length,
               itemBuilder: (context, index) {
@@ -63,8 +68,13 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
           ),
 
-          // 🎧 MINI PLAYER (BOTTOM)
-          const MiniPlayer(),
+          // 🎧 MINI PLAYER FLOATING ABOVE BOTTOM
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 10, // small margin
+            child: MiniPlayer(),
+          ),
         ],
       ),
     );
