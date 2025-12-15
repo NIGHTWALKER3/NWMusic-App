@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/music_provider.dart';
 import '../player/audio_player.dart';
+import '../widgets/mini_player.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -25,8 +26,11 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         title: const Text("Search Music"),
       ),
+
+      // 👇 BODY + MINI PLAYER
       body: Column(
         children: [
+          // 🔎 SEARCH FIELD
           Padding(
             padding: const EdgeInsets.all(10),
             child: TextField(
@@ -41,6 +45,8 @@ class _SearchScreenState extends State<SearchScreen> {
               onSubmitted: (_) => search(),
             ),
           ),
+
+          // 🎵 SONG LIST
           Expanded(
             child: ListView.builder(
               itemCount: songs.length,
@@ -50,13 +56,15 @@ class _SearchScreenState extends State<SearchScreen> {
                   title: Text(song['name']),
                   subtitle: Text(song['artist_name']),
                   onTap: () {
-                    // 🔥 NEW CORRECT METHOD
                     AppAudioPlayer.playFromList(songs, index);
                   },
                 );
               },
             ),
           ),
+
+          // 🎧 MINI PLAYER (BOTTOM)
+          const MiniPlayer(),
         ],
       ),
     );
