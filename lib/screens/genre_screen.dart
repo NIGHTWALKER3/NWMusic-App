@@ -44,28 +44,32 @@ class _GenreScreenState extends State<GenreScreen> {
         ],
       ),
 
-      // 👇 BODY + MINI PLAYER
-      body: Column(
+      // 👇 BODY + MINI PLAYER FLOATING
+      body: Stack(
         children: [
           // 🎵 SONG LIST
-          Expanded(
-            child: ListView.builder(
-              itemCount: songs.length,
-              itemBuilder: (context, index) {
-                final song = songs[index];
-                return ListTile(
-                  title: Text(song['name']),
-                  subtitle: Text(song['artist_name']),
-                  onTap: () {
-                    AppAudioPlayer.playFromList(songs, index);
-                  },
-                );
-              },
-            ),
+          ListView.builder(
+            padding: const EdgeInsets.only(bottom: 90), // reserve space for MiniPlayer
+            itemCount: songs.length,
+            itemBuilder: (context, index) {
+              final song = songs[index];
+              return ListTile(
+                title: Text(song['name']),
+                subtitle: Text(song['artist_name']),
+                onTap: () {
+                  AppAudioPlayer.playFromList(songs, index);
+                },
+              );
+            },
           ),
 
-          // 🎧 MINI PLAYER (BOTTOM)
-          const MiniPlayer(),
+          // 🎧 MINI PLAYER FLOATING ABOVE BOTTOM
+          const Positioned(
+            left: 0,
+            right: 0,
+            bottom: 10, // small margin above bottom
+            child: MiniPlayer(),
+          ),
         ],
       ),
     );
