@@ -36,7 +36,7 @@ class _GenreScreenState extends State<GenreScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const SearchScreen()),
+                MaterialPageRoute(builder: (_) => SearchScreen()), // removed const
               );
             },
           )
