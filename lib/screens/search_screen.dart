@@ -3,37 +3,42 @@ import '../services/music_provider.dart';
 import '../player/audio_player.dart';
 
 class SearchScreen extends StatefulWidget {
+  const SearchScreen({super.key});
+
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  List songs = [];
+  List<Map<String, dynamic>> songs = [];
   final TextEditingController controller = TextEditingController();
 
-  void search() async {
+  Future<void> search() async {
     if (controller.text.isEmpty) return;
     final data = await MusicProvider.search(controller.text);
-    setState(() => songs = data);
+    setState(() => songs = List<Map<String, dynamic>>.from(data));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Search Music")),
+      appBar: AppBar(
+        title: const Text("Search Music"),
+      ),
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(10),
             child: TextField(
               controller: controller,
               decoration: InputDecoration(
                 hintText: "Song or artist",
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
+                  icon: const Icon(Icons.search),
                   onPressed: search,
                 ),
               ),
+              onSubmitted: (_) => search(),
             ),
           ),
           Expanded(
@@ -45,7 +50,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   title: Text(song['name']),
                   subtitle: Text(song['artist_name']),
                   onTap: () {
-                    AppAudioPlayer.play(song['audio']);
+                    // 🔥 NEW CORRECT METHOD
+                    AppAudioPlayer.playFromList(songs, index);
                   },
                 );
               },
@@ -56,4 +62,3 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 }
-
