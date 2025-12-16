@@ -1,19 +1,20 @@
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 
 class AppAudioPlayer {
   static final AudioPlayer _player = AudioPlayer();
 
-  // Current playlist
+  // Playlist
   static List<Map<String, dynamic>> _playlist = [];
   static int _currentIndex = -1;
 
-  // Currently playing song info
+  // Currently playing song
   static Map<String, dynamic>? currentSong;
 
-  // Expose player to UI
+  // Expose player
   static AudioPlayer get player => _player;
 
-  /// Play a song from a list (used for next / prev)
+  /// Play song from list
   static Future<void> playFromList(
     List<Map<String, dynamic>> songs,
     int index,
@@ -24,12 +25,26 @@ class AppAudioPlayer {
     _currentIndex = index;
     currentSong = songs[index];
 
-    final url = currentSong!['audio'];
-    await _player.setUrl(url);
+    final audioUrl = currentSong!['audio'];
+    final imageUrl =
+        currentSong!['image'] ?? currentSong!['album_image'] ?? '';
+
+    await _player.setAudioSource(
+      AudioSource.uri(
+        Uri.parse(audioUrl),
+        tag: MediaItem(
+          id: audioUrl,
+          title: currentSong!['name'] ?? 'Unknown Song',
+          artist: currentSong!['artist_name'] ?? 'Unknown Artist',
+          artUri: imageUrl.isNotEmpty ? Uri.parse(imageUrl) : null,
+        ),
+      ),
+    );
+
     _player.play();
   }
 
-  /// Play / Pause toggle
+  /// Toggle play / pause
   static void togglePlayPause() {
     if (_player.playing) {
       _player.pause();
@@ -50,7 +65,7 @@ class AppAudioPlayer {
     await playFromList(_playlist, _currentIndex - 1);
   }
 
-  /// Stop player
+  /// Stop playback
   static Future<void> stop() async {
     await _player.stop();
     currentSong = null;
