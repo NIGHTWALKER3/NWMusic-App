@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/genre_screen.dart';
+import 'screens/main_screen.dart';
 
 void main() {
   runApp(const MyMusicApp());
@@ -10,10 +10,10 @@ class MyMusicApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: GenreScreen(),
+      theme: ThemeData.dark(), // 🔥 black theme like Spotify
+      home: const MainScreen(), // 🔥 Home / Search / Library
     );
   }
 }
-
