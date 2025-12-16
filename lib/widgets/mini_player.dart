@@ -13,7 +13,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
   void initState() {
     super.initState();
 
-    // Listen to player state changes
+    // Rebuild mini player when audio state changes
     AppAudioPlayer.player.playerStateStream.listen((_) {
       if (mounted) setState(() {});
     });
@@ -23,8 +23,10 @@ class _MiniPlayerState extends State<MiniPlayer> {
   Widget build(BuildContext context) {
     final song = AppAudioPlayer.currentSong;
 
-    // If no song is playing, show nothing
-    if (song == null) return const SizedBox.shrink();
+    // Hide mini player if nothing is playing
+    if (song == null) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       height: 70,
@@ -38,12 +40,21 @@ class _MiniPlayerState extends State<MiniPlayer> {
         children: [
           // 🎵 SONG IMAGE
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Image.network(
-              song['image'] ?? song['album_image'],
-              width: 50,
-              height: 50,
-              fit: BoxFit.cover,
+            padding: const EdgeInsets.all(8),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: Image.network(
+                song['image'] ?? song['album_image'] ?? '',
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  width: 50,
+                  height: 50,
+                  color: Colors.grey.shade800,
+                  child: const Icon(Icons.music_note, color: Colors.white),
+                ),
+              ),
             ),
           ),
 
@@ -54,7 +65,7 @@ class _MiniPlayerState extends State<MiniPlayer> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  song['name'],
+                  song['name'] ?? 'Unknown Song',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -62,8 +73,9 @@ class _MiniPlayerState extends State<MiniPlayer> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                const SizedBox(height: 2),
                 Text(
-                  song['artist_name'],
+                  song['artist_name'] ?? 'Unknown Artist',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -102,4 +114,3 @@ class _MiniPlayerState extends State<MiniPlayer> {
     );
   }
 }
-
