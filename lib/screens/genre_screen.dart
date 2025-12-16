@@ -28,49 +28,51 @@ class _GenreScreenState extends State<GenreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Genre: $genre"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SearchScreen()),
-              );
-            },
-          ),
-        ],
-      ),
+    return SafeArea(
+      bottom: true, // 🔥 ensures above gesture buttons
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Genre: $genre"),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SearchScreen()),
+                );
+              },
+            ),
+          ],
+        ),
 
-      // 👇 BODY + MINI PLAYER FLOATING
-      body: Stack(
-        children: [
-          // 🎵 SONG LIST
-          ListView.builder(
-            padding: const EdgeInsets.only(bottom: 90), // reserve space for MiniPlayer
-            itemCount: songs.length,
-            itemBuilder: (context, index) {
-              final song = songs[index];
-              return ListTile(
-                title: Text(song['name']),
-                subtitle: Text(song['artist_name']),
-                onTap: () {
-                  AppAudioPlayer.playFromList(songs, index);
-                },
-              );
-            },
-          ),
+        body: Stack(
+          children: [
+            // 🎵 SONG LIST
+            ListView.builder(
+              padding: const EdgeInsets.only(bottom: 110), // space for MiniPlayer
+              itemCount: songs.length,
+              itemBuilder: (context, index) {
+                final song = songs[index];
+                return ListTile(
+                  title: Text(song['name']),
+                  subtitle: Text(song['artist_name']),
+                  onTap: () {
+                    AppAudioPlayer.playFromList(songs, index);
+                  },
+                );
+              },
+            ),
 
-          // 🎧 MINI PLAYER FLOATING ABOVE BOTTOM
-          const Positioned(
-            left: 0,
-            right: 0,
-            bottom: 10, // small margin above bottom
-            child: MiniPlayer(),
-          ),
-        ],
+            // 🎧 MINI PLAYER (FLOATING, SAFE)
+            const Positioned(
+              left: 8,
+              right: 8,
+              bottom: 16, // 🔥 perfect Spotify-like spacing
+              child: MiniPlayer(),
+            ),
+          ],
+        ),
       ),
     );
   }
