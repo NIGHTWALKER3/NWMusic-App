@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/mini_player.dart';
+import '../player/audio_player.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -65,49 +66,76 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _horizontalSongs() {
+    // TEMP SAMPLE SONGS (replace with API later)
+    final songs = [
+      {
+        "name": "Sample Song 1",
+        "artist_name": "Unknown Artist",
+        "url":
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+        "image": null,
+        "album_image": null,
+      },
+      {
+        "name": "Sample Song 2",
+        "artist_name": "Unknown Artist",
+        "url":
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+        "image": null,
+        "album_image": null,
+      },
+    ];
+
     return SizedBox(
       height: 160,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: 10,
+        itemCount: songs.length,
         itemBuilder: (context, index) {
-          return Container(
-            width: 130,
-            margin: const EdgeInsets.only(right: 14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    height: 120,
-                    color: Colors.grey.shade800,
-                    child: const Center(
-                      child: Icon(
-                        Icons.music_note,
-                        size: 40,
-                        color: Colors.white,
+          final song = songs[index];
+
+          return GestureDetector(
+            onTap: () {
+              AppAudioPlayer.playSong(song, songs);
+            },
+            child: Container(
+              width: 130,
+              margin: const EdgeInsets.only(right: 14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      height: 120,
+                      color: Colors.grey.shade800,
+                      child: const Center(
+                        child: Icon(
+                          Icons.play_arrow,
+                          size: 40,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  "Song Name",
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Colors.white),
-                ),
-                const Text(
-                  "Artist",
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
+                  const SizedBox(height: 8),
+                  Text(
+                    song['name'],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: Colors.white),
                   ),
-                ),
-              ],
+                  Text(
+                    song['artist_name'],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
