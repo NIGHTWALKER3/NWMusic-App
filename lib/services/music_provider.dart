@@ -11,15 +11,20 @@ class MusicProvider {
     FmaService(),
   ];
 
-  // Get by genre (only from Jamendo for now)
+  // Get by genre (Jamendo only) – optional
   static Future<List<Map<String, dynamic>>> getByGenre(String genre) async {
-    return _sources[0].fetchByGenre(genre); // Jamendo only
+    try {
+      return await _sources[0].fetchByGenre(genre);
+    } catch (_) {
+      return [];
+    }
   }
 
-  // Search across all sources (fixed blank screen issue)
+  // Search across all sources
+  // If query is empty, it will fetch top/default tracks from all sources
   static Future<List<Map<String, dynamic>>> search(String query) async {
     try {
-      // Fetch results from all sources in parallel
+      // Fetch from all sources in parallel
       final results = await Future.wait(
         _sources.map((source) => source.searchMusic(query)),
       );
@@ -29,7 +34,6 @@ class MusicProvider {
 
       return mergedResults;
     } catch (_) {
-      // If something fails, return empty list
       return [];
     }
   }
