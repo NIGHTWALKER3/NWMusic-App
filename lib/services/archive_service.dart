@@ -1,11 +1,16 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/song.dart';
 import 'api_interface.dart';
 
-class ArchiveService implements MusicApiInterface {
+class ArchiveService implements MusicAPI {
   @override
-  Future<List<Song>> searchSongs(String query) async {
+  Future<List<Map<String, dynamic>>> fetchByGenre(String genre) async {
+    // Archive doesn't support genre search easily
+    return [];
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> searchMusic(String query) async {
     final url =
         'https://archive.org/advancedsearch.php'
         '?q=$query AND mediatype:audio'
@@ -20,14 +25,13 @@ class ArchiveService implements MusicApiInterface {
 
     return docs.map((item) {
       final id = item['identifier'];
-      return Song(
-        id: id,
-        title: item['title'] ?? 'Unknown',
-        artist: item['creator'] ?? 'Unknown',
-        streamUrl: 'https://archive.org/download/$id/$id.mp3',
-        source: 'Archive',
-      );
+      return {
+        'id': id,
+        'title': item['title'] ?? 'Unknown',
+        'artist': item['creator'] ?? 'Unknown',
+        'stream_url': 'https://archive.org/download/$id/$id.mp3',
+        'source': 'Archive',
+      };
     }).toList();
   }
 }
-
