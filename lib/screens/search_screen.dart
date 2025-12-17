@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/music_provider.dart';
 import '../player/audio_player.dart';
 import '../widgets/mini_player.dart';
+import 'youtube_player_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -13,11 +14,40 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends State<SearchScreen> {
   List<Map<String, dynamic>> songs = [];
   final TextEditingController controller = TextEditingController();
+  bool isLoading = false;
 
   Future<void> search() async {
-    if (controller.text.isEmpty) return;
-    final data = await MusicProvider.search(controller.text);
-    setState(() => songs = List<Map<String, dynamic>>.from(data));
+    if (controller.text.trim().isEmpty) return;
+
+    setState(() {
+      isLoading = true;
+      songs.clear();
+    });
+
+    final data = await MusicProvider.search(controller.text.trim());
+
+    setState(() {
+      songs = List<Map<String, dynamic>>.from(data);
+      isLoading = false;
+    });
+  }
+
+  void playSong(BuildContext context, Map<String, dynamic> song, int index) {
+    final source = song['source'];
+
+    if (source == 'YouTube') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => YouTubePlayerScreen(
+            videoId: song['videoId'],
+            title: song['name'],
+          ),
+        ),
+      );
+    } else {
+      AppAudioPlayer.playFromList(songs, index);
+    }
   }
 
   @override
@@ -26,19 +56,17 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         title: const Text("Search Music"),
       ),
-
-      // 👇 BODY + MINI PLAYER FLOATING
       body: Stack(
         children: [
           Column(
             children: [
-              // 🔎 SEARCH FIELD
+              // 🔎 SEARCH BAR
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: TextField(
                   controller: controller,
                   decoration: InputDecoration(
-                    hintText: "Song or artist",
+                    hintText: "Search song / artist",
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: search,
@@ -47,32 +75,42 @@ class _SearchScreenState extends State<SearchScreen> {
                   onSubmitted: (_) => search(),
                 ),
               ),
+
+              if (isLoading)
+                const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: CircularProgressIndicator(),
+                ),
+
+              // 🎵 RESULTS
+              Expanded(
+                child: ListView.builder(
+                  itemCount: songs.length,
+                  itemBuilder: (context, index) {
+                    final song = songs[index];
+                    return ListTile(
+                      leading: Icon(
+                        song['source'] == 'YouTube'
+                            ? Icons.play_circle_fill
+                            : Icons.music_note,
+                      ),
+                      title: Text(song['name'] ?? 'Unknown'),
+                      subtitle: Text(
+                        "${song['artist_name'] ?? 'Unknown'} • ${song['source']}",
+                      ),
+                      onTap: () => playSong(context, song, index),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
 
-          // 🎵 SONG LIST
-          Padding(
-            padding: const EdgeInsets.only(top: 70, bottom: 90), // space for search & player
-            child: ListView.builder(
-              itemCount: songs.length,
-              itemBuilder: (context, index) {
-                final song = songs[index];
-                return ListTile(
-                  title: Text(song['name']),
-                  subtitle: Text(song['artist_name']),
-                  onTap: () {
-                    AppAudioPlayer.playFromList(songs, index);
-                  },
-                );
-              },
-            ),
-          ),
-
-          // 🎧 MINI PLAYER FLOATING ABOVE BOTTOM
+          // 🎧 MINI PLAYER (only for non-YouTube)
           const Positioned(
             left: 0,
             right: 0,
-            bottom: 10, // small margin
+            bottom: 10,
             child: MiniPlayer(),
           ),
         ],
