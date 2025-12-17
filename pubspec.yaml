@@ -11,20 +11,14 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # Networking
   http: ^1.3.6
-
-  # Audio playback (Jamendo / Archive / FMA)
   just_audio: ^0.9.36
-
-  # YouTube playback
-  youtube_player_flutter: ^8.1.2
-
-  # State management (safe to keep)
+  youtube_player_flutter: ^8.1.3
   provider: ^6.0.5
-
-  # iOS icons
   cupertino_icons: ^1.0.6
+
+dependency_overrides:
+  flutter_inappwebview: ^6.0.0
 
 flutter:
   uses-material-design: true
