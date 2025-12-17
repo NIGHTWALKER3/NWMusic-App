@@ -96,7 +96,8 @@ class HomeScreen extends StatelessWidget {
 
           return GestureDetector(
             onTap: () {
-              AppAudioPlayer.playSong(song, songs);
+              // ✅ FIX: correct method
+              AppAudioPlayer.playFromList(songs, index);
             },
             child: Container(
               width: 130,
