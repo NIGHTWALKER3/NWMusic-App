@@ -13,23 +13,24 @@ class MusicProvider {
 
   // Get by genre (only from Jamendo for now)
   static Future<List<Map<String, dynamic>>> getByGenre(String genre) async {
-    // You can extend other sources later if needed
     return _sources[0].fetchByGenre(genre); // Jamendo only
   }
 
-  // Search across all sources
+  // Search across all sources (fixed blank screen issue)
   static Future<List<Map<String, dynamic>>> search(String query) async {
-    final List<Map<String, dynamic>> results = [];
+    try {
+      // Fetch results from all sources in parallel
+      final results = await Future.wait(
+        _sources.map((source) => source.searchMusic(query)),
+      );
 
-    for (final source in _sources) {
-      try {
-        final res = await source.searchMusic(query);
-        results.addAll(res);
-      } catch (_) {
-        // Ignore failed source
-      }
+      // Merge all results into a single list
+      final mergedResults = results.expand((list) => list).toList();
+
+      return mergedResults;
+    } catch (_) {
+      // If something fails, return empty list
+      return [];
     }
-
-    return results;
   }
 }
