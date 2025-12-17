@@ -13,7 +13,6 @@ class GenreScreen extends StatefulWidget {
 
 class _GenreScreenState extends State<GenreScreen> {
   List<Map<String, dynamic>> songs = [];
-  String genre = "chill";
 
   @override
   void initState() {
@@ -22,17 +21,17 @@ class _GenreScreenState extends State<GenreScreen> {
   }
 
   Future<void> loadMusic() async {
-    final data = await MusicProvider.getByGenre(genre);
+    final data = await MusicProvider.search(""); // 🔥 fetch all sources
     setState(() => songs = List<Map<String, dynamic>>.from(data));
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      bottom: true, // 🔥 ensures above gesture buttons
+      bottom: true,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Genre: $genre"),
+          title: const Text("All Music"),
           actions: [
             IconButton(
               icon: const Icon(Icons.search),
@@ -45,30 +44,27 @@ class _GenreScreenState extends State<GenreScreen> {
             ),
           ],
         ),
-
         body: Stack(
           children: [
-            // 🎵 SONG LIST
             ListView.builder(
-              padding: const EdgeInsets.only(bottom: 110), // space for MiniPlayer
+              padding: const EdgeInsets.only(bottom: 110),
               itemCount: songs.length,
               itemBuilder: (context, index) {
                 final song = songs[index];
                 return ListTile(
-                  title: Text(song['name']),
-                  subtitle: Text(song['artist_name']),
+                  title: Text(song['title'] ?? 'Unknown'),
+                  subtitle: Text(song['artist'] ?? 'Unknown'),
+                  trailing: Text(song['source'] ?? ''),
                   onTap: () {
                     AppAudioPlayer.playFromList(songs, index);
                   },
                 );
               },
             ),
-
-            // 🎧 MINI PLAYER (FLOATING, SAFE)
             const Positioned(
               left: 8,
               right: 8,
-              bottom: 16, // 🔥 perfect Spotify-like spacing
+              bottom: 16,
               child: MiniPlayer(),
             ),
           ],
