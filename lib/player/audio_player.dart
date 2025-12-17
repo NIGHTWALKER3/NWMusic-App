@@ -25,7 +25,14 @@ class AppAudioPlayer {
     _currentIndex = index;
     currentSong = songs[index];
 
-    final audioUrl = currentSong!['audio'];
+    // ✅ FIX: support all common audio keys
+    final audioUrl =
+        currentSong!['audio'] ??
+        currentSong!['url'] ??
+        currentSong!['audio_url'];
+
+    if (audioUrl == null || audioUrl.toString().isEmpty) return;
+
     final imageUrl =
         currentSong!['image'] ?? currentSong!['album_image'] ?? '';
 
