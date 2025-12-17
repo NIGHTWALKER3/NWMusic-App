@@ -1,17 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:just_audio_background/just_audio_background.dart';
 import 'screens/main_screen.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // ⚠️ Do NOT await this (prevents app from freezing on splash)
-  JustAudioBackground.init(
-    androidNotificationChannelId: 'com.music.app.channel.audio',
-    androidNotificationChannelName: 'Music Playback',
-    androidNotificationOngoing: true,
-  );
-
   runApp(const MyMusicApp());
 }
 
