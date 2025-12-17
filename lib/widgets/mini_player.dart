@@ -14,12 +14,8 @@ class _MiniPlayerState extends State<MiniPlayer> {
   void initState() {
     super.initState();
 
-    // Rebuild mini player when audio state or current song changes
+    // Rebuild mini player when audio state changes
     AppAudioPlayer.player.playerStateStream.listen((_) {
-      if (mounted) setState(() {});
-    });
-
-    AppAudioPlayer.player.positionStream.listen((_) {
       if (mounted) setState(() {});
     });
   }
@@ -28,7 +24,10 @@ class _MiniPlayerState extends State<MiniPlayer> {
   Widget build(BuildContext context) {
     final song = AppAudioPlayer.currentSong;
 
-    if (song == null) return const SizedBox.shrink();
+    // Hide mini player if nothing is playing
+    if (song == null) {
+      return const SizedBox.shrink();
+    }
 
     return GestureDetector(
       onTap: () {
@@ -63,7 +62,8 @@ class _MiniPlayerState extends State<MiniPlayer> {
                     width: 50,
                     height: 50,
                     color: Colors.grey.shade800,
-                    child: const Icon(Icons.music_note, color: Colors.white),
+                    child:
+                        const Icon(Icons.music_note, color: Colors.white),
                   ),
                 ),
               ),
