@@ -4,54 +4,70 @@ import 'package:just_audio_background/just_audio_background.dart';
 class AppAudioPlayer {
   static final AudioPlayer _player = AudioPlayer();
 
-  // Playlist
   static List<Map<String, dynamic>> _playlist = [];
   static int _currentIndex = -1;
 
-  // Currently playing song
   static Map<String, dynamic>? currentSong;
 
-  // Expose player
   static AudioPlayer get player => _player;
 
-  /// Play song from list
+  /// Play song from list (SAFE VERSION)
   static Future<void> playFromList(
     List<Map<String, dynamic>> songs,
     int index,
   ) async {
     if (songs.isEmpty || index < 0 || index >= songs.length) return;
 
+    final song = songs[index];
+
+    // 🔑 Try all possible audio keys
+    final audioUrl =
+        song['audio'] ??
+        song['url'] ??
+        song['audio_url'] ??
+        song['preview_url'];
+
+    // ❌ Stop if audio URL is invalid
+    if (audioUrl == null ||
+        audioUrl.toString().isEmpty ||
+        !audioUrl.toString().startsWith('http')) {
+      print('❌ Invalid audio URL: $song');
+      return;
+    }
+
     _playlist = songs;
     _currentIndex = index;
-    currentSong = songs[index];
-
-    // ✅ FIX: support all common audio keys
-    final audioUrl =
-        currentSong!['audio'] ??
-        currentSong!['url'] ??
-        currentSong!['audio_url'];
-
-    if (audioUrl == null || audioUrl.toString().isEmpty) return;
+    currentSong = song;
 
     final imageUrl =
-        currentSong!['image'] ?? currentSong!['album_image'] ?? '';
+        song['image'] ??
+        song['album_image'] ??
+        song['cover'] ??
+        '';
 
-    await _player.setAudioSource(
-      AudioSource.uri(
-        Uri.parse(audioUrl),
-        tag: MediaItem(
-          id: audioUrl,
-          title: currentSong!['name'] ?? 'Unknown Song',
-          artist: currentSong!['artist_name'] ?? 'Unknown Artist',
-          artUri: imageUrl.isNotEmpty ? Uri.parse(imageUrl) : null,
+    try {
+      await _player.stop();
+
+      await _player.setAudioSource(
+        AudioSource.uri(
+          Uri.parse(audioUrl),
+          tag: MediaItem(
+            id: audioUrl,
+            title: song['name'] ?? song['title'] ?? 'Unknown Song',
+            artist:
+                song['artist_name'] ?? song['artist'] ?? 'Unknown Artist',
+            artUri: imageUrl.isNotEmpty ? Uri.parse(imageUrl) : null,
+          ),
         ),
-      ),
-    );
+      );
 
-    _player.play();
+      await _player.play();
+    } catch (e) {
+      print('❌ Audio error: $e');
+    }
   }
 
-  /// Toggle play / pause
+  /// Play / Pause
   static void togglePlayPause() {
     if (_player.playing) {
       _player.pause();
@@ -60,19 +76,19 @@ class AppAudioPlayer {
     }
   }
 
-  /// Play next song
+  /// Next
   static Future<void> playNext() async {
     if (_currentIndex + 1 >= _playlist.length) return;
     await playFromList(_playlist, _currentIndex + 1);
   }
 
-  /// Play previous song
+  /// Previous
   static Future<void> playPrevious() async {
     if (_currentIndex - 1 < 0) return;
     await playFromList(_playlist, _currentIndex - 1);
   }
 
-  /// Stop playback
+  /// Stop
   static Future<void> stop() async {
     await _player.stop();
     currentSong = null;
