@@ -22,14 +22,16 @@ class YouTubeService {
 
     return items.map((item) {
       final snippet = item['snippet'];
+
       return {
-        'title': snippet['title'],
-        'artist': snippet['channelTitle'],
+        // ✅ STANDARD KEYS (VERY IMPORTANT)
+        'name': snippet['title'],
+        'artist_name': snippet['channelTitle'],
         'videoId': item['id']['videoId'],
         'thumbnail': snippet['thumbnails']['high']['url'],
+        'stream_url': null, // YouTube uses videoId, not direct audio
         'source': 'YouTube',
       };
     }).toList();
   }
 }
-
